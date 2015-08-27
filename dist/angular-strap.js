@@ -3343,12 +3343,14 @@
           scope.$digest();
         };
         var show = $typeahead.show;
+        var isKeyDownAttached = false;
         $typeahead.show = function() {
           show();
           $timeout(function() {
             $typeahead.$element && $typeahead.$element.on('mousedown', $typeahead.$onMouseDown);
-            if (options.keyboard) {
+            if (options.keyboard && !isKeyDownAttached) {
               element && element.on('keydown', $typeahead.$onKeyDown);
+              isKeyDownAttached = true;
             }
           }, 0, false);
         };
@@ -3357,6 +3359,7 @@
           $typeahead.$element && $typeahead.$element.off('mousedown', $typeahead.$onMouseDown);
           if (options.keyboard) {
             element && element.off('keydown', $typeahead.$onKeyDown);
+              isKeyDownAttached = false;
           }
           if (!options.autoSelect) $typeahead.activate(-1);
           hide();
@@ -3599,7 +3602,12 @@
           if (options.animation) tipElement.addClass(options.animation);
           if (options.type) tipElement.addClass(options.prefixClass + '-' + options.type);
           if (options.customClass) tipElement.addClass(options.customClass);
-          after ? after.after(tipElement) : parent.prepend(tipElement);
+            //TODO Check fixing of a bug
+            try {
+	        	after ? after.after(tipElement) : parent.prepend(tipElement);
+	        } catch (e) {
+		       
+	        } 
           $tooltip.$isShown = scope.$isShown = true;
           safeDigest(scope);
           $tooltip.$applyPlacement();
