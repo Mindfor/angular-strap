@@ -1883,7 +1883,8 @@
         }
         $modal.$id = options.id || options.element && options.element.attr('id') || '';
         forEach([ 'title', 'content' ], function(key) {
-          if (options[key]) scope[key] = $sce.trustAsHtml(options[key]);
+          if (options[key]) 
+               scope[key] = angular.isString(options[key]) ? $sce.trustAsHtml(options[key]) : options[key];
         });
         scope.$hide = function() {
           scope.$$postDigest(function() {
