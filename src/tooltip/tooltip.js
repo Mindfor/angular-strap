@@ -202,7 +202,12 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
           // Append the element, without any animations.  If we append
           // using $animate.enter, some of the animations cause the placement
           // to be off due to the transforms.
-          after ? after.after(tipElement) : parent.prepend(tipElement);
+          //TODO Check fixing of a bug
+//        try {
+	        	after ? after.after(tipElement) : parent.prepend(tipElement);
+//	      } catch (e) {
+//		       
+//	      } 
 
           $tooltip.$isShown = scope.$isShown = true;
           safeDigest(scope);

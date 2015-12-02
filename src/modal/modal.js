@@ -46,9 +46,10 @@ angular.module('mgcrea.ngStrap.modal', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap.h
         // element id if defined
         $modal.$id = options.id || options.element && options.element.attr('id') || '';
 
-        // Support scope as string options
-        forEach(['title', 'content'], function(key) {
-          if(options[key]) scope[key] = $sce.trustAsHtml(options[key]);
+        // Support scope as string options or direct object
+        forEach([ 'title', 'content' ], function(key) {
+          if (options[key]) 
+               scope[key] = angular.isString(options[key]) ? $sce.trustAsHtml(options[key]) : options[key];
         });
 
         // Provide scope helpers
