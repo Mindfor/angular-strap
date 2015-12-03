@@ -168,6 +168,10 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
           if (!options.bsEnabled || $tooltip.$isShown) return;
 
           scope.$emit(options.prefixEvent + '.show.before', $tooltip);
+            
+          // Hide any existing tipElement
+          if(tipElement) destroyTipElement();
+            
           var parent, after;
           if (options.container) {
             parent = tipContainer;
@@ -180,10 +184,7 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
             parent = null;
             after = element;
           }
-
-
-          // Hide any existing tipElement
-          if(tipElement) destroyTipElement();
+        
           // Fetch a cloned element linked from template
           tipScope = $tooltip.$scope.$new();
           tipElement = $tooltip.$element = compileData.link(tipScope, function(clonedElement, scope) {});
@@ -202,12 +203,7 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
           // Append the element, without any animations.  If we append
           // using $animate.enter, some of the animations cause the placement
           // to be off due to the transforms.
-          //TODO Check fixing of a bug
-//        try {
-	        	after ? after.after(tipElement) : parent.prepend(tipElement);
-//	      } catch (e) {
-//		       
-//	      } 
+          after ? after.after(tipElement) : parent.prepend(tipElement);
 
           $tooltip.$isShown = scope.$isShown = true;
           safeDigest(scope);

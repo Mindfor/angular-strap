@@ -124,6 +124,9 @@
         $tooltip.show = function() {
           if (!options.bsEnabled || $tooltip.$isShown) return;
           scope.$emit(options.prefixEvent + '.show.before', $tooltip);
+          
+          if (tipElement) destroyTipElement();
+            
           var parent, after;
           if (options.container) {
             parent = tipContainer;
@@ -136,7 +139,7 @@
             parent = null;
             after = element;
           }
-          if (tipElement) destroyTipElement();
+      
           tipScope = $tooltip.$scope.$new();
           tipElement = $tooltip.$element = compileData.link(tipScope, function(clonedElement, scope) {});
           tipElement.css({
@@ -150,11 +153,7 @@
           if (options.type) tipElement.addClass(options.prefixClass + '-' + options.type);
           if (options.customClass) tipElement.addClass(options.customClass);
             
-//        try {
-	        	after ? after.after(tipElement) : parent.prepend(tipElement);
-//	      } catch (e) {
-//		       
-//	      } 
+	      after ? after.after(tipElement) : parent.prepend(tipElement);
             
           $tooltip.$isShown = scope.$isShown = true;
           safeDigest(scope);
