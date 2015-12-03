@@ -149,7 +149,13 @@
           if (options.animation) tipElement.addClass(options.animation);
           if (options.type) tipElement.addClass(options.prefixClass + '-' + options.type);
           if (options.customClass) tipElement.addClass(options.customClass);
-          after ? after.after(tipElement) : parent.prepend(tipElement);
+            
+//        try {
+	        	after ? after.after(tipElement) : parent.prepend(tipElement);
+//	      } catch (e) {
+//		       
+//	      } 
+            
           $tooltip.$isShown = scope.$isShown = true;
           safeDigest(scope);
           $tooltip.$applyPlacement();
@@ -675,12 +681,14 @@
           scope.$digest();
         };
         var show = $typeahead.show;
+            var isKeyDownAttached = false;
         $typeahead.show = function() {
           show();
           $timeout(function() {
             $typeahead.$element && $typeahead.$element.on('mousedown', $typeahead.$onMouseDown);
             if (options.keyboard) {
               element && element.on('keydown', $typeahead.$onKeyDown);
+              isKeyDownAttached = true;
             }
           }, 0, false);
         };
@@ -689,6 +697,7 @@
           $typeahead.$element && $typeahead.$element.off('mousedown', $typeahead.$onMouseDown);
           if (options.keyboard) {
             element && element.off('keydown', $typeahead.$onKeyDown);
+            isKeyDownAttached = false;
           }
           if (!options.autoSelect) $typeahead.activate(-1);
           hide();
@@ -2581,9 +2590,12 @@
           options.container = 'body';
         }
         $modal.$id = options.id || options.element && options.element.attr('id') || '';
+          
         forEach([ 'title', 'content' ], function(key) {
-          if (options[key]) scope[key] = $sce.trustAsHtml(options[key]);
+          if (options[key]) 
+               scope[key] = angular.isString(options[key]) ? $sce.trustAsHtml(options[key]) : options[key];
         });
+
         scope.$hide = function() {
           scope.$$postDigest(function() {
             $modal.hide();
