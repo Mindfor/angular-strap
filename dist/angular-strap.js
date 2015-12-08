@@ -2473,7 +2473,7 @@
     	throw new Error('Missing `contentTemplate` / `contentTemplateUrl` option.');
     }
 
-    if (options.contentTemplate) {
+    if (resolve.$contentTemplate) {
     	resolve.$template = $q.all([resolve.$template, resolve.$contentTemplate]).then(function (templates) {
         var templateEl = angular.element(templates[0]);
         var contentEl = findElement('[ng-bind="content"]', templateEl[0]).removeAttr('ng-bind').html(templates[1]);
