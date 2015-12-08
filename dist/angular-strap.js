@@ -2458,20 +2458,18 @@
       }
     });
     angular.extend(resolve, locals);
-    if (template) {
+      
+    if (template)
       resolve.$template = $q.when(template);
-    } else if (templateUrl) {
+    else if (templateUrl)
       resolve.$template = fetchTemplate(templateUrl);
-    } else {
+    else 
       throw new Error('Missing `template` / `templateUrl` option.');
-    }
-    if (contentTemplate) {
+    
+    if (contentTemplate)
     	resolve.$contentTemplate = $q.when(contentTemplate);
-    } else if (contentTemplateUrl) {
+    else if (contentTemplateUrl)
     	resolve.$contentTemplate = fetchTemplate(contentTemplateUrl);
-    } else {
-    	throw new Error('Missing `contentTemplate` / `contentTemplateUrl` option.');
-    }
 
     if (resolve.$contentTemplate) {
     	resolve.$template = $q.all([resolve.$template, resolve.$contentTemplate]).then(function (templates) {
