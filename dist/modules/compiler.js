@@ -18,6 +18,8 @@ function bsCompilerService($q, $http, $injector, $compile, $controller, $templat
     }
     var templateUrl = options.templateUrl;
     var template = options.template || '';
+    var contentTemplateUrl = options.contentTemplateUrl;
+    var contentTemplate = options.contentTemplate || '';
     var controller = options.controller;
     var controllerAs = options.controllerAs;
     var resolve = angular.copy(options.resolve || {});
@@ -39,14 +41,23 @@ function bsCompilerService($q, $http, $injector, $compile, $controller, $templat
     } else {
       throw new Error('Missing `template` / `templateUrl` option.');
     }
+    if (contentTemplate) {
+    	resolve.$contentTemplate = $q.when(contentTemplate);
+    } else if (contentTemplateUrl) {
+    	resolve.$contentTemplate = fetchTemplate(contentTemplateUrl);
+    } else {
+    	throw new Error('Missing `contentTemplate` / `contentTemplateUrl` option.');
+    }
+
     if (options.contentTemplate) {
-      resolve.$template = $q.all([ resolve.$template, fetchTemplate(options.contentTemplate) ]).then(function(templates) {
+    	resolve.$template = $q.all([resolve.$template, resolve.$contentTemplate]).then(function (templates) {
         var templateEl = angular.element(templates[0]);
         var contentEl = findElement('[ng-bind="content"]', templateEl[0]).removeAttr('ng-bind').html(templates[1]);
         if (!options.templateUrl) contentEl.next().remove();
         return templateEl[0].outerHTML;
       });
     }
+
     return $q.all(resolve).then(function(locals) {
       var template = transformTemplate(locals.$template);
       if (options.html) {
