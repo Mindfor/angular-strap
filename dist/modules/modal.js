@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.8 - 2016-03-31
+ * @version v2.3.8 - 2016-04-05
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -47,7 +47,7 @@ angular.module('mgcrea.ngStrap.modal', [ 'mgcrea.ngStrap.core', 'mgcrea.ngStrap.
       }
       $modal.$id = options.id || options.element && options.element.attr('id') || '';
       forEach([ 'title', 'content' ], function(key) {
-        if (options[key]) scope[key] = $sce.trustAsHtml(options[key]);
+        if (options[key]) scope[key] = angular.isString(options[key]) ? $sce.trustAsHtml(options[key]) : options[key];
       });
       scope.$hide = function() {
         scope.$$postDigest(function() {

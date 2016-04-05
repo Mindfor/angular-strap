@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.8 - 2016-03-31
+ * @version v2.3.8 - 2016-04-05
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -20,6 +20,10 @@ function bsCompilerService($q, $http, $injector, $compile, $controller, $templat
     }
     var templateUrl = options.templateUrl;
     var template = options.template || '';
+    var contentTemplateUrl = options.contentTemplateUrl;
+    var contentTemplate = options.contentTemplate || '';
+    var titleTemplateUrl = options.titleTemplateUrl;
+    var titleTemplate = options.titleTemplate || '';
     var controller = options.controller;
     var controllerAs = options.controllerAs;
     var resolve = angular.copy(options.resolve || {});
@@ -34,28 +38,20 @@ function bsCompilerService($q, $http, $injector, $compile, $controller, $templat
       }
     });
     angular.extend(resolve, locals);
-    if (template) {
-      resolve.$template = $q.when(template);
-    } else if (templateUrl) {
-      resolve.$template = fetchTemplate(templateUrl);
-    } else {
-      throw new Error('Missing `template` / `templateUrl` option.');
-    }
-    if (options.titleTemplate) {
-      resolve.$template = $q.all([ resolve.$template, fetchTemplate(options.titleTemplate) ]).then(function(templates) {
-        var templateEl = angular.element(templates[0]);
-        findElement('[ng-bind="title"]', templateEl[0]).removeAttr('ng-bind').html(templates[1]);
-        return templateEl[0].outerHTML;
-      });
-    }
-    if (options.contentTemplate) {
-      resolve.$template = $q.all([ resolve.$template, fetchTemplate(options.contentTemplate) ]).then(function(templates) {
-        var templateEl = angular.element(templates[0]);
-        var contentEl = findElement('[ng-bind="content"]', templateEl[0]).removeAttr('ng-bind').html(templates[1]);
-        if (!options.templateUrl) contentEl.next().remove();
-        return templateEl[0].outerHTML;
-      });
-    }
+    if (template) resolve.$template = $q.when(template); else if (templateUrl) resolve.$template = fetchTemplate(templateUrl); else throw new Error('Missing `template` / `templateUrl` option.');
+    if (contentTemplate) resolve.$contentTemplate = $q.when(contentTemplate); else if (contentTemplateUrl) resolve.$contentTemplate = fetchTemplate(contentTemplateUrl);
+    if (titleTemplate) resolve.$titleTemplate = $q.when(contentTemplate); else if (titleTemplateUrl) resolve.$titleTemplate = fetchTemplate(contentTemplateUrl);
+    if (resolve.$titleTemplate) resolve.$template = $q.all([ resolve.$template, resolve.$titleTemplate ]).then(function(templates) {
+      var templateEl = angular.element(templates[0]);
+      findElement('[ng-bind="title"]', templateEl[0]).removeAttr('ng-bind').html(templates[1]);
+      return templateEl[0].outerHTML;
+    });
+    if (resolve.$contentTemplate) resolve.$template = $q.all([ resolve.$template, resolve.$contentTemplate ]).then(function(templates) {
+      var templateEl = angular.element(templates[0]);
+      var contentEl = findElement('[ng-bind="content"]', templateEl[0]).removeAttr('ng-bind').html(templates[1]);
+      if (!options.templateUrl) contentEl.next().remove();
+      return templateEl[0].outerHTML;
+    });
     return $q.all(resolve).then(function(locals) {
       var template = transformTemplate(locals.$template);
       if (options.html) {

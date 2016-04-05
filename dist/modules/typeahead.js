@@ -1,6 +1,6 @@
 /**
  * angular-strap
- * @version v2.3.8 - 2016-03-31
+ * @version v2.3.8 - 2016-04-05
  * @link http://mgcrea.github.io/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com> (https://github.com/mgcrea)
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -106,13 +106,15 @@ angular.module('mgcrea.ngStrap.typeahead', [ 'mgcrea.ngStrap.tooltip', 'mgcrea.n
         scope.$digest();
       };
       var show = $typeahead.show;
+      var isKeyDownAttached = false;
       $typeahead.show = function() {
         show();
         $timeout(function() {
           if ($typeahead.$element) {
             $typeahead.$element.on('mousedown', $typeahead.$onMouseDown);
-            if (options.keyboard) {
+            if (options.keyboard && !isKeyDownAttached) {
               if (element) element.on('keydown', $typeahead.$onKeyDown);
+              isKeyDownAttached = true;
             }
           }
         }, 0, false);
@@ -122,6 +124,7 @@ angular.module('mgcrea.ngStrap.typeahead', [ 'mgcrea.ngStrap.tooltip', 'mgcrea.n
         if ($typeahead.$element) $typeahead.$element.off('mousedown', $typeahead.$onMouseDown);
         if (options.keyboard) {
           if (element) element.off('keydown', $typeahead.$onKeyDown);
+          isKeyDownAttached = false;
         }
         if (!options.autoSelect) {
           $typeahead.activate(-1);
@@ -213,7 +216,10 @@ angular.module('mgcrea.ngStrap.typeahead', [ 'mgcrea.ngStrap.tooltip', 'mgcrea.n
         var selected = index !== -1 ? typeahead.$scope.$matches[index].label : controller.$viewValue;
         selected = angular.isObject(selected) ? parsedOptions.displayValue(selected) : selected;
         var value = selected ? selected.toString().replace(/<(?:.|\n)*?>/gm, '') : '';
+        var ss = element[0].selectionStart;
+        var sd = element[0].selectionEnd;
         element.val(options.trimValue === false ? value : value.trim());
+        element[0].setSelectionRange(ss, sd);
       };
       scope.$on('$destroy', function() {
         if (typeahead) typeahead.destroy();
